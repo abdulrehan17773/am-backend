@@ -26,11 +26,12 @@ app.use(cookieParser());  // This parses cookies for access to req.cookies
 
 // import routes here
 import { UserRouter } from './routes/user.routes.js';
+import { AdminRouter } from './routes/admin.routes.js';
 
 // define routes here
 app.use("/api/v1/user", UserRouter);
+app.use("/api/v1/admin", AdminRouter);
 
 
 // app.use(handleError)
-
 export { app };
