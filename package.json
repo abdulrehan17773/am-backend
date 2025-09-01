@@ -1,9 +1,11 @@
 {
   "name": "am-backend",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js",
+    "start": "src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
+    "nanoid": "^5.1.5",
     "nodemailer": "^7.0.6"
   }
 }
