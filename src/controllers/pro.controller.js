@@ -329,17 +329,21 @@ const removeImage = asyncHandler(async (req, res) => {
   const product = await Product.findById(id);
   if (!product || product.deletedAt) throw new ApiError(404, "Product not found");
 
+  if (product.images.length <= 1) {
+    throw new ApiError(400, "Cannot delete the last image of the product");
+  }
+
   const imageIndex = product.images.findIndex((img) => img.url === url);
   if (imageIndex === -1) throw new ApiError(404, "Image not found");
 
   await deleteFileFromCloudinary(url);
 
   product.images.splice(imageIndex, 1);
-  await product.save();
+  const updatedProduct = await product.save();
 
   res
     .status(200)
-    .json(new ApiResponse(200, product, "Image removed successfully"));
+    .json(new ApiResponse(200, updatedProduct, "Image removed successfully"));
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
