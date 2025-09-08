@@ -153,46 +153,38 @@ const createProduct = asyncHandler(async (req, res) => {
   const { name, description, price, discount, category, variants, isFeatured } =
     req.body;
 
-  // ✅ validate required fields
+  // 🔹 Validate required fields
   if (!name || !price || !category) {
-    throw new ApiError(
-      400,
-      "Name, price, and category are required"
-    );
+    throw new ApiError(400, "Name, price, and category are required");
   }
 
-  // ✅ validate category exists
+  // 🔹 Check if category exists
   const catDoc = await Category.findOne({ _id: category, deletedAt: null });
   if (!catDoc) throw new ApiError(404, "Category not found");
 
-  // ✅ check if product with same name exists
-  const existing = await Product.findOne({
-    name: name.trim(),
-    deletedAt: null,
-  });
+  // 🔹 Check if product with same name exists
+  const existing = await Product.findOne({ name: name.trim(), deletedAt: null });
   if (existing) throw new ApiError(400, "Product with this name already exists");
 
-  // ✅ upload images to cloudinary
+  // 🔹 Ensure images are provided
   if (!req.files || req.files.length === 0) {
     throw new ApiError(400, "At least one image is required");
   }
 
+  // 🔹 Upload multiple images to Cloudinary
   const uploadedImages = [];
   for (const file of req.files) {
-    const uploadRes = await handleUploadFile(file.path);
-    if (uploadRes) {
-      uploadedImages.push({
-        url: uploadRes.secure_url,
-        alt: file.originalname || "",
-      });
+    const uploaded = await handleUploadFile(file.path);
+    if (!uploaded?.secure_url) {
+      throw new ApiError(500, "Failed to upload one or more images");
     }
+    uploadedImages.push({
+      url: uploaded.secure_url,
+      alt: file.originalname || "",
+    });
   }
 
-  if (uploadedImages.length === 0) {
-    throw new ApiError(500, "Failed to upload product images");
-  }
-
-  // ✅ create product
+  // 🔹 Create product
   const product = await Product.create({
     name,
     description,
@@ -204,7 +196,7 @@ const createProduct = asyncHandler(async (req, res) => {
     isFeatured: isFeatured || false,
   });
 
-  res
+  return res
     .status(201)
     .json(new ApiResponse(201, product, "Product created successfully"));
 });
@@ -295,25 +287,37 @@ const updateVariants = asyncHandler(async (req, res) => {
 
 const addImage = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const file = req.file;
 
-  if (!req.file?.path) throw new ApiError(400, "Image file is required");
-
-  const uploadRes = await handleUploadFile(req.file.path);
-  if (!uploadRes) throw new ApiError(500, "Failed to upload image");
-
+  // 🔹 Find product first
   const product = await Product.findById(id);
-  if (!product || product.deletedAt) throw new ApiError(404, "Product not found");
+  if (!product || product.deletedAt) {
+    throw new ApiError(404, "Product not found");
+  }
 
+  if (!file) {
+    res.status(400);
+    throw new ApiError(400, "Please upload an image");
+  }
+
+  // 🔹 Upload new image to Cloudinary
+  const uploadedImage = await handleUploadFile(file.path);
+  if (!uploadedImage?.secure_url) {
+    res.status(500);
+    throw new ApiError(500, "Image upload failed");
+  }
+
+  // 🔹 Add new image
   product.images.push({
-    url: uploadRes.secure_url,
+    url: uploadedImage.secure_url,
     alt: req.body.alt || "",
   });
 
-  await product.save();
+  const updatedProduct = await product.save();
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, product, "Image added successfully"));
+  return res.status(200).json(
+    new ApiResponse(200, updatedProduct, "Image added successfully")
+  );
 });
 
 const removeImage = asyncHandler(async (req, res) => {
@@ -325,17 +329,21 @@ const removeImage = asyncHandler(async (req, res) => {
   const product = await Product.findById(id);
   if (!product || product.deletedAt) throw new ApiError(404, "Product not found");
 
+  if (product.images.length <= 1) {
+    throw new ApiError(400, "Cannot delete the last image of the product");
+  }
+
   const imageIndex = product.images.findIndex((img) => img.url === url);
   if (imageIndex === -1) throw new ApiError(404, "Image not found");
 
   await deleteFileFromCloudinary(url);
 
   product.images.splice(imageIndex, 1);
-  await product.save();
+  const updatedProduct = await product.save();
 
   res
     .status(200)
-    .json(new ApiResponse(200, product, "Image removed successfully"));
+    .json(new ApiResponse(200, updatedProduct, "Image removed successfully"));
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
