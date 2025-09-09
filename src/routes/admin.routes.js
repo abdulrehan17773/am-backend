@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createUserByAdmin, updateUserByAdmin, deleteUserByAdmin, getAllUsersByAdmin } from "../controllers/user.controller.js";
 import { createCategoryByAdmin, updateCategoryByAdmin, deleteCategoryByAdmin, getAllCategoriesByAdmin } from "../controllers/cat.controller.js";
 import { createProduct, updateProduct, toggleActive, toggleFeatured, updateVariants, addImage, removeImage, deleteProduct, getAllProductsAdmin, getSingleProductAdmin } from "../controllers/pro.controller.js";
+import { getAllOrdersByAdmin, getOrderDetailsByAdmin, rejectOrder, updatePayment, updateStatus } from "../controllers/order.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { checkAuth, checkAdmin } from "../middlewares/checkAuth.middleware.js";
 
@@ -32,5 +33,13 @@ AdminRouter.patch("/pro/update-variants/:id", updateVariants);
 AdminRouter.post("/pro/add-image/:id", upload.single("image"), addImage);
 AdminRouter.delete("/pro/remove-image/:id", removeImage);
 AdminRouter.delete("/pro/delete/:id", deleteProduct);
+
+// 🟢 Order routes
+AdminRouter.get("/order/getall", getAllOrdersByAdmin);
+AdminRouter.get("/order/get/:orderId", getOrderDetailsByAdmin);
+AdminRouter.patch("/order/reject/:orderId", rejectOrder);
+AdminRouter.patch("/order/update-payment/:orderId", updatePayment);
+AdminRouter.patch("/order/update-status/:orderId", updateStatus);
+
 
 export { AdminRouter };
