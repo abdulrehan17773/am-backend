@@ -28,15 +28,24 @@ const orderSchema = new Schema(
         price: { type: Number, required: true }, // snapshot of product price at order time
       },
     ],
+    subtotal: { 
+      type: Number, 
+      required: true, // total of products only
+    },
+    deliveryFee: {
+      type: Number,
+      required: true,
+      default: 0, // can be dynamic based on location
+    },
     totalAmount: { 
       type: Number, 
-      required: true, 
+      required: true, // subtotal + deliveryFee
     },
     status: {
       type: String,
       enum: ["pending", "preparing", "rejected", "cancelled", "shipped", "delivered", "refunded"],
       default: "pending",
-      index: true, // index for faster queries
+      index: true,
     },
     paymentMethod: {
       type: String,
@@ -47,7 +56,7 @@ const orderSchema = new Schema(
       type: String,
       enum: ["pending", "completed", "failed", "refunded"],
       default: "pending",
-      index: true, // index for faster queries
+      index: true,
     },
     rejectReason: { 
       type: String, // for rejected orders 
