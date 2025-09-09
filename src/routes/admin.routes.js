@@ -36,10 +36,10 @@ AdminRouter.delete("/pro/delete/:id", deleteProduct);
 
 // 🟢 Order routes
 AdminRouter.get("/order/getall", getAllOrdersByAdmin);
-AdminRouter.get("/order/get/:orderId", getOrderDetailsByAdmin);
-AdminRouter.patch("/order/reject/:orderId", rejectOrder);
-AdminRouter.patch("/order/update-payment/:orderId", updatePayment);
-AdminRouter.patch("/order/update-status/:orderId", updateStatus);
+AdminRouter.get("/order/get/:id", getOrderDetailsByAdmin);
+AdminRouter.patch("/order/reject/:id", rejectOrder);
+AdminRouter.patch("/order/update-payment/:id", updatePayment);
+AdminRouter.patch("/order/update-status/:id", updateStatus);
 
 
 export { AdminRouter };
