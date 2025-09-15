@@ -35,6 +35,7 @@ const generateTokens = async (userId) => {
 
 const registerUser = asyncHandler( async (req, res) => {
     // Get data from request body
+    console.log("call in");
     const { fullname,phone, email, password } = req.body;
 
     // Check if any of the fields are empty
