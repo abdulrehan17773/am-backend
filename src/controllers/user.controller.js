@@ -90,8 +90,8 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Email and password are required");
   }
 
-  // find user
-  const userExists = await User.findOne({ email: email.toLowerCase() });
+  // find user WITH password
+  const userExists = await User.findOne({ email: email.toLowerCase() }).select("+password");
   if (!userExists) {
     throw new ApiError(404, "User not found");
   }
@@ -125,7 +125,8 @@ const loginUser = asyncHandler(async (req, res) => {
   await sendEmail(loginUser.email, `Login`, `Login successfully!`);
 
   // return response with cookies
-  return res.status(200)
+  return res
+    .status(200)
     .cookie("refreshToken", refreshToken, options)
     .cookie("accessToken", accessToken, options)
     .json(
