@@ -33,8 +33,20 @@ const generateTokens = async (userId) => {
   return { accessToken, refreshToken };
 };
 
+const helloworld = asyncHandler( async (req, res) => {
+    // Get data from request body
+    console.log("call in");
+    
+    // return success message
+    return res.status(200).json(
+        new ApiResponse(201, "noting", "User created successfully")
+    )
+
+});
+
 const registerUser = asyncHandler( async (req, res) => {
     // Get data from request body
+    console.log("call in");
     const { fullname,phone, email, password } = req.body;
 
     // Check if any of the fields are empty
@@ -665,4 +677,4 @@ const getAllUsersByAdmin = asyncHandler(async (req, res) => {
 });
 
 
-export { registerUser, loginUser, logout, tokenUpdate, currentUser, verifyUser, resendOtp, updateProfile, updateCurrency, updateAvatar, updatePassword,forgetPassword, sendForgetPassword, checkExpiryForget, createUserByAdmin, updateUserByAdmin, deleteUserByAdmin, getAllUsersByAdmin };
+export {helloworld, registerUser, loginUser, logout, tokenUpdate, currentUser, verifyUser, resendOtp, updateProfile, updateCurrency, updateAvatar, updatePassword,forgetPassword, sendForgetPassword, checkExpiryForget, createUserByAdmin, updateUserByAdmin, deleteUserByAdmin, getAllUsersByAdmin };

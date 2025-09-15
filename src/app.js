@@ -34,6 +34,7 @@ import { OrderRouter } from './routes/order.routes.js';
 import { AddressRouter } from './routes/address.routes.js';
 
 // define routes here
+app.use("/api/v1/hello", UserRouter);
 app.use("/api/v1/user", UserRouter);
 app.use("/api/v1/admin", AdminRouter);
 app.use("/api/v1/category", CatRouter);
