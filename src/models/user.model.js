@@ -10,6 +10,7 @@ const userSchema = new Schema(
       unique: true,
       index: true,
       required: true,
+      default: () => nanoid(12),
     },
     fullname: {
       type: String,
@@ -72,7 +73,6 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   if (this.isNew) {
-    this.uid = nanoid(12);
     this.otp = Math.floor(100000 + Math.random() * 900000);
     this.otp_time = Date.now() + 15 * 60 * 1000; // 15 mins
   }
