@@ -1,1 +1,1 @@
-export const DBName = 'advocate';
+export const DBName = 'trendorabox';
